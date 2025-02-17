@@ -2,7 +2,6 @@ package io.spring.batch.springbatch;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
-import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -13,11 +12,10 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
-public class JobParameterConfiguration {
+public class StepConfiguration {
 
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
@@ -33,23 +31,7 @@ public class JobParameterConfiguration {
     @Bean
     public Step step1(){
         return stepBuilderFactory.get("step1")
-                .tasklet(new Tasklet() {
-                    @Override
-                    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception{
-
-                        JobParameters jobParameters = contribution.getStepExecution().getJobParameters();
-
-                        jobParameters.getString("name");
-                        jobParameters.getLong("seq");
-                        jobParameters.getDate("date");
-                        jobParameters.getDouble("age");
-
-                        Map<String, Object> jobParameters1 = chunkContext.getStepContext().getJobParameters();
-
-
-                        return RepeatStatus.FINISHED;
-                    }
-                }).build();
+                .tasklet(new CustomTasklet()).build();
     }
 
     @Bean
@@ -58,6 +40,8 @@ public class JobParameterConfiguration {
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception{
+
+                        //throw new RuntimeException("step2 is failed");
                         return RepeatStatus.FINISHED;
                     }
                 }).build();
